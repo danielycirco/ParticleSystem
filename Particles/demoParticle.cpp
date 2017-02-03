@@ -43,13 +43,17 @@ void demoParticle::update(){
 
 	//1 - APPLY THE FORCES BASED ON WHICH MODE WE ARE IN 
 	
-	if( mode == PARTICLE_MODE_ATTRACT ){
+	if (mode == PARTICLE_MODE_ATTRACT) {
 		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
-		frc = attractPt-pos; // we get the attraction force/vector by looking at the mouse pos relative to our pos
+		frc = attractPt - pos; // we get the attraction force/vector by looking at the mouse pos relative to our pos
 		frc.normalize(); //by normalizing we disregard how close the particle is to the attraction point 
-		
-		vel *= drag; //apply drag
-		vel += frc * 0.6; //apply force
+
+		if (ofGetMousePressed()){
+			vel *= drag; //apply drag
+			vel += frc * 0.6; //apply force
+		}else {
+			vel *= 0.99;
+		}
 	}
 	else if( mode == PARTICLE_MODE_REPEL ){
 		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
