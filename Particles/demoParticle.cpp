@@ -128,6 +128,40 @@ void demoParticle::update(){
 		}
 		
 	}
+	else if (mode == PARTICLE_MODE_VAR) {
+		float fakeWindX = ofSignedNoise(pos.x * 0.003, pos.y * 0.006, ofGetElapsedTimef() * 0.6);
+		
+		ofPoint actualPt(ofGetMouseX(), ofGetMouseY());
+		ofPoint previousPt(ofGetPreviousMouseX(), ofGetPreviousMouseY());
+				
+		ofPoint frc1 = actualPt - previousPt;
+		ofPoint	frc2 = actualPt - pos; // we get the attraction force/vector by looking at the mouse pos relative to our pos
+		
+									   //let get the distance and only repel points close to the mouse
+		float dist = frc1.length();
+		frc1.normalize();
+		frc2.normalize(); //by normalizing we disregard how close the particle is to the attraction point 
+		
+		frc = frc1*0.2 + frc2*0.8;
+
+		vel *= drag;
+		if (dist > 10) {
+			vel += frc * 0.4; //notice the frc is negative 
+		}
+		else {
+			//if the particles are not close to us, lets add a little bit of random movement using noise. this is where uniqueVal comes in handy. 			
+			frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.6;
+			frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, ofGetElapsedTimef()*0.2) * 0.09 + 0.28;
+
+			vel *= drag;
+			vel += frc * 0.4;
+
+			//we do this so as to skip the bounds check for the bottom and make the particles go back to the top of the screen
+			/*if (pos.y + vel.y > ofGetHeight()) {
+				pos.y -= ofGetHeight();
+			}*/
+		}
+	}
 	
 	
 	//2 - UPDATE OUR POSITION
