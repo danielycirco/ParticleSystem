@@ -47,7 +47,8 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    ofBackgroundGradient(ofColor(60,60,60), ofColor(10,10,10), OF_GRADIENT_LINEAR);
+	ofBackground(0,0,0);
+	//ofBackgroundGradient(ofColor(60,60,60), ofColor(10,10,10), OF_GRADIENT_LINEAR);
 
 	for(unsigned int i = 0; i < p.size(); i++){
 		p[i].draw();
@@ -86,7 +87,12 @@ void ofApp::keyPressed(int key){
 		currentModeStr = "4 - PARTICLE_MODE_NOISE: snow particle simulation"; 						
 		resetParticles();
 	}	
-		
+	if (key == '5') {
+		currentMode = PARTICLE_MODE_VAR;
+		currentModeStr = "5 - PARTICLE_MODE_VAR: Waves";
+		resetParticles();
+	}
+
 	if( key == ' ' ){
 		resetParticles();
 	}
