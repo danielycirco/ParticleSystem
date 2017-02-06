@@ -11,7 +11,7 @@ void demoParticle::setMode(particleMode newMode){
 }
 
 //------------------------------------------------------------------
-void demoParticle::setAttractPoints( vector <ofPoint> * attract ){
+void demoParticle::setAttractPoints( vector <ofPoint> * attract ){ //4 points adress?????????????????????????????
 	attractPoints = attract;
 }
 
@@ -29,6 +29,8 @@ void demoParticle::reset(){
 	frc   = ofPoint(0,0,0);
 	
 	scale = ofRandom(0.5, 2.0);
+
+	touche = false;
 	
 	if( mode == PARTICLE_MODE_NOISE ){
 		drag  = ofRandom(0.97, 0.99);
@@ -132,7 +134,7 @@ void demoParticle::update(){
 		}
 		
 	}
-	else if (mode == PARTICLE_MODE_VAR) {
+	else if (mode == PARTICLE_MODE_SNOW) {
 		float fakeWindX = ofSignedNoise(pos.x * 0.003, pos.y * 0.006, ofGetElapsedTimef() * 0.6);
 		
 		ofPoint actualPt(ofGetMouseX(), ofGetMouseY());
@@ -166,7 +168,30 @@ void demoParticle::update(){
 			}*/
 		}
 	}
-	
+	if (mode == PARTICLE_MODE_GRILL) {
+		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
+		frc = attractPt - pos;
+
+		//let get the distance and only repel points close to the mouse
+		float dist = frc.length();
+
+		frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, ofGetElapsedTimef()*0.2) * 0.09 + 0.28;
+		frc.normalize();
+
+		vel.x = 0;
+
+		if ((dist < 50) || (touche == true)) {
+			//vel.y *= drag; //apply drag
+			vel.y += frc.y * 2.6; //apply force
+			touche = true;
+		}
+		else {
+			vel.y = 0;
+		}
+		if (pos.y + vel.y > ofGetHeight()) {
+			vel.y = 0;
+		}
+	}
 	
 	//2 - UPDATE OUR POSITION
 	
@@ -209,8 +234,14 @@ void demoParticle::draw(){
 	else if( mode == PARTICLE_MODE_NEAREST_POINTS ){
 		ofSetColor(103, 160, 237);
 	}
-	
-	ofDrawCircle(pos.x, pos.y, scale * 3.0);
+	else if (mode == PARTICLE_MODE_SNOW) {
+		ofSetColor(255, 255, 255);
+	}
+	else if (mode == PARTICLE_MODE_GRILL) {
+		ofSetColor(255, 0, 255);
+	}
+
+	ofDrawCircle(pos.x, pos.y, scale * 2.0);
 
 	//ofDrawTriangle(pos.x, pos.y, pos.x+10, pos.y+10, pos.x-10, pos.y+10);
 		

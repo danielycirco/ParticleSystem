@@ -6,7 +6,8 @@ enum particleMode{
 	PARTICLE_MODE_REPEL,
 	PARTICLE_MODE_NEAREST_POINTS,
 	PARTICLE_MODE_NOISE,
-	PARTICLE_MODE_VAR
+	PARTICLE_MODE_SNOW,
+	PARTICLE_MODE_GRILL
 };
 
 class demoParticle{
@@ -24,6 +25,7 @@ class demoParticle{
 		ofPoint pos;
 		ofPoint vel;
 		ofPoint frc;
+		bool touche;
 		
 		float drag; 
 		float uniqueVal;

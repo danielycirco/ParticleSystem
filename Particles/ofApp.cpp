@@ -4,7 +4,7 @@
 void ofApp::setup(){
 	ofSetVerticalSync(true);
 	
-	int num = 1500;
+	int num = 2000;
 	p.assign(num, demoParticle());
 	currentMode = PARTICLE_MODE_ATTRACT;
 
@@ -40,7 +40,7 @@ void ofApp::update(){
 	
 	//lets add a bit of movement to the attract points
 	for(unsigned int i = 0; i < attractPointsWithMovement.size(); i++){
-		attractPointsWithMovement[i].x = attractPoints[i].x + ofSignedNoise(i * 10, ofGetElapsedTimef() * 0.7) * 12.0;
+		attractPointsWithMovement[i].x = attractPoints[i].x + ofSignedNoise(i * 10, ofGetElapsedTimef() * 1.7) * 12.0;
 		attractPointsWithMovement[i].y = attractPoints[i].y + ofSignedNoise(i * -10, ofGetElapsedTimef() * 0.7) * 12.0;
 	}	
 }
@@ -88,11 +88,19 @@ void ofApp::keyPressed(int key){
 		resetParticles();
 	}	
 	if (key == '5') {
-		currentMode = PARTICLE_MODE_VAR;
-		currentModeStr = "5 - PARTICLE_MODE_VAR: Waves";
+		currentMode = PARTICLE_MODE_SNOW;
+		currentModeStr = "5 - PARTICLE_MODE_SNOW: Waves";
+		resetParticles();
+	}
+	if (key == '6') {
+		currentMode = PARTICLE_MODE_GRILL;
+		currentModeStr = "6 - PARTICLE_MODE_GRILL: Grill";
 		resetParticles();
 	}
 
+
+
+	
 	if( key == ' ' ){
 		resetParticles();
 	}
