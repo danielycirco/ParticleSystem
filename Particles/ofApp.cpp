@@ -4,7 +4,7 @@
 void ofApp::setup(){
 	ofSetVerticalSync(true);
 	
-	int num = 1500;
+	int num = 1000;
 	p.assign(num, demoParticle());
 	currentMode = PARTICLE_MODE_ATTRACT;
 
@@ -66,7 +66,7 @@ void ofApp::draw(){
 	}
 
 	ofSetColor(230);	
-	ofDrawBitmapString(currentModeStr + "\n\nSpacebar to reset. \nKeys 1-4 to change mode.", 10, 20);
+	ofDrawBitmapString(currentModeStr + "\n\nSpacebar to reset. \nKeys 1-4 to change mode. \nFramerate: " + ofToString(ofGetFrameRate(),0) , 10, 20);
 }
 
 //--------------------------------------------------------------

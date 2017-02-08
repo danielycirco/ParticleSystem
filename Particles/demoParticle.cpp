@@ -215,17 +215,9 @@ void demoParticle::update(){
 			vel *= 0.99;
 		}
 
-
-		if ((dist < 50)) life = 150;		
-		
-		if (life > lifetime) {
-			visible = true;
-			life--;
-		}
-		else {
-			visible = false;
+		if ((dist < 50)) life = 255;		
+		if (life > lifetime) life--;
 			
-		}
 	}
 
 
@@ -283,7 +275,7 @@ void demoParticle::draw(){
 		ofSetColor(55, 100, 255);
 	}
 	else if (mode == PARTICLE_MODE_LIFE) {
-		ofSetColor(55, 100, 155);
+		ofSetColor(0, life, life);
 	}
 
 	ofDrawCircle(pos.x, pos.y, scale * 2.0);
