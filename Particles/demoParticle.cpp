@@ -11,7 +11,7 @@ void demoParticle::setMode(particleMode newMode){
 }
 
 //------------------------------------------------------------------
-void demoParticle::setAttractPoints( vector <ofPoint> * attract ){
+void demoParticle::setAttractPoints( vector <ofPoint> * attract ){ //4 points adress?????????????????????????????
 	attractPoints = attract;
 }
 
@@ -29,6 +29,10 @@ void demoParticle::reset(){
 	frc   = ofPoint(0,0,0);
 	
 	scale = ofRandom(0.5, 2.0);
+
+	touche = false;
+	visible = true;
+	life = 0;
 	
 	if( mode == PARTICLE_MODE_NOISE ){
 		drag  = ofRandom(0.97, 0.99);
@@ -43,13 +47,17 @@ void demoParticle::update(){
 
 	//1 - APPLY THE FORCES BASED ON WHICH MODE WE ARE IN 
 	
-	if( mode == PARTICLE_MODE_ATTRACT ){
+	if (mode == PARTICLE_MODE_ATTRACT) {
 		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
-		frc = attractPt-pos; // we get the attraction force/vector by looking at the mouse pos relative to our pos
+		frc = attractPt - pos; // we get the attraction force/vector by looking at the mouse pos relative to our pos
 		frc.normalize(); //by normalizing we disregard how close the particle is to the attraction point 
-		
-		vel *= drag; //apply drag
-		vel += frc * 0.6; //apply force
+
+		if (ofGetMousePressed()){
+			vel *= drag; //apply drag
+			vel += frc * 0.6; //apply force
+		}else {
+			vel *= 0.99;
+		}
 	}
 	else if( mode == PARTICLE_MODE_REPEL ){
 		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
@@ -128,7 +136,7 @@ void demoParticle::update(){
 		}
 		
 	}
-	else if (mode == PARTICLE_MODE_VAR) {
+	else if (mode == PARTICLE_MODE_SNOW) {
 		float fakeWindX = ofSignedNoise(pos.x * 0.003, pos.y * 0.006, ofGetElapsedTimef() * 0.6);
 		
 		ofPoint actualPt(ofGetMouseX(), ofGetMouseY());
@@ -151,7 +159,7 @@ void demoParticle::update(){
 		else {
 			//if the particles are not close to us, lets add a little bit of random movement using noise. this is where uniqueVal comes in handy. 			
 			frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.6;
-			frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, ofGetElapsedTimef()*0.2) * 0.09 + 0.28;
+			frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, ofGetElapsedTimef()*0.2) * 0.9 + 2.5;
 
 			vel *= drag;
 			vel += frc * 0.4;
@@ -162,8 +170,57 @@ void demoParticle::update(){
 			}*/
 		}
 	}
+	if (mode == PARTICLE_MODE_GRILL) {
+		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
+		frc = attractPt - pos;
+
+		//let get the distance and only repel points close to the mouse
+		float dist = frc.length();
+
+		frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, ofGetElapsedTimef()*0.2) * 0.9 + 1.28;
+		frc.normalize();
+
+		vel.x = 0;
+
+		if ((dist < 50) || (touche == true)) {
+			//vel.y *= drag; //apply drag
+			vel.y += frc.y * 2.6; //apply force
+			touche = true;
+		}
+		else {
+			vel.y = 0;
+		}
+		if (pos.y + vel.y > ofGetHeight()) {
+			vel.y = 0;
+		}
+	}
 	
-	
+	if (mode == PARTICLE_MODE_LIFE) {
+		int lifetime = 0;
+		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
+		frc = attractPt - pos;
+
+		//let get the distance and only repel points close to the mouse
+		float dist = frc.length();
+		frc.normalize();
+
+		if (ofGetMousePressed()) {
+			vel *= drag; //apply drag
+			vel += frc * 0.6; //apply force
+		}
+		else {
+			frc.x = ofSignedNoise(uniqueVal, pos.y * 0.01, ofGetElapsedTimef()*0.2);
+			frc.y = ofSignedNoise(uniqueVal, pos.x * 0.01, ofGetElapsedTimef()*0.2);
+			vel += frc * 0.04;
+			vel *= 0.99;
+		}
+
+		if ((dist < 50)) life = 255;		
+		if (life > lifetime) life--;
+			
+	}
+
+
 	//2 - UPDATE OUR POSITION
 	
 	pos += vel; 
@@ -180,8 +237,14 @@ void demoParticle::update(){
 		vel.x *= -1.0;
 	}
 	if( pos.y > ofGetHeight() ){
-		pos.y = ofGetHeight();
-		vel.y *= -1.0;
+		if (mode == PARTICLE_MODE_SNOW) {
+			pos.y = ofGetHeight();
+			vel.y *= -0.7;
+		}
+		else {
+			pos.y = ofGetHeight();
+			vel.y *= -1.0;
+		}
 	}
 	else if( pos.y < 0 ){
 		pos.y = 0;
@@ -205,8 +268,17 @@ void demoParticle::draw(){
 	else if( mode == PARTICLE_MODE_NEAREST_POINTS ){
 		ofSetColor(103, 160, 237);
 	}
-	
-	ofDrawCircle(pos.x, pos.y, scale * 3.0);
+	else if (mode == PARTICLE_MODE_SNOW) {
+		ofSetColor(255, 255, 255);
+	}
+	else if (mode == PARTICLE_MODE_GRILL) {
+		ofSetColor(55, 100, 255);
+	}
+	else if (mode == PARTICLE_MODE_LIFE) {
+		ofSetColor(0, life, life);
+	}
+
+	ofDrawCircle(pos.x, pos.y, scale * 2.0);
 
 	//ofDrawTriangle(pos.x, pos.y, pos.x+10, pos.y+10, pos.x-10, pos.y+10);
 		
