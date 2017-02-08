@@ -31,6 +31,8 @@ void demoParticle::reset(){
 	scale = ofRandom(0.5, 2.0);
 
 	touche = false;
+	visible = true;
+	life = 0;
 	
 	if( mode == PARTICLE_MODE_NOISE ){
 		drag  = ofRandom(0.97, 0.99);
@@ -157,7 +159,7 @@ void demoParticle::update(){
 		else {
 			//if the particles are not close to us, lets add a little bit of random movement using noise. this is where uniqueVal comes in handy. 			
 			frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.6;
-			frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, ofGetElapsedTimef()*0.2) * 0.09 + 0.28;
+			frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, ofGetElapsedTimef()*0.2) * 0.9 + 2.5;
 
 			vel *= drag;
 			vel += frc * 0.4;
@@ -175,7 +177,7 @@ void demoParticle::update(){
 		//let get the distance and only repel points close to the mouse
 		float dist = frc.length();
 
-		frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, ofGetElapsedTimef()*0.2) * 0.09 + 0.28;
+		frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, ofGetElapsedTimef()*0.2) * 0.9 + 1.28;
 		frc.normalize();
 
 		vel.x = 0;
@@ -193,6 +195,40 @@ void demoParticle::update(){
 		}
 	}
 	
+	if (mode == PARTICLE_MODE_LIFE) {
+		int lifetime = 0;
+		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
+		frc = attractPt - pos;
+
+		//let get the distance and only repel points close to the mouse
+		float dist = frc.length();
+		frc.normalize();
+
+		if (ofGetMousePressed()) {
+			vel *= drag; //apply drag
+			vel += frc * 0.6; //apply force
+		}
+		else {
+			frc.x = ofSignedNoise(uniqueVal, pos.y * 0.01, ofGetElapsedTimef()*0.2);
+			frc.y = ofSignedNoise(uniqueVal, pos.x * 0.01, ofGetElapsedTimef()*0.2);
+			vel += frc * 0.04;
+			vel *= 0.99;
+		}
+
+
+		if ((dist < 50)) life = 150;		
+		
+		if (life > lifetime) {
+			visible = true;
+			life--;
+		}
+		else {
+			visible = false;
+			
+		}
+	}
+
+
 	//2 - UPDATE OUR POSITION
 	
 	pos += vel; 
@@ -209,8 +245,14 @@ void demoParticle::update(){
 		vel.x *= -1.0;
 	}
 	if( pos.y > ofGetHeight() ){
-		pos.y = ofGetHeight();
-		vel.y *= -1.0;
+		if (mode == PARTICLE_MODE_SNOW) {
+			pos.y = ofGetHeight();
+			vel.y *= -0.7;
+		}
+		else {
+			pos.y = ofGetHeight();
+			vel.y *= -1.0;
+		}
 	}
 	else if( pos.y < 0 ){
 		pos.y = 0;
@@ -238,7 +280,10 @@ void demoParticle::draw(){
 		ofSetColor(255, 255, 255);
 	}
 	else if (mode == PARTICLE_MODE_GRILL) {
-		ofSetColor(255, 0, 255);
+		ofSetColor(55, 100, 255);
+	}
+	else if (mode == PARTICLE_MODE_LIFE) {
+		ofSetColor(55, 100, 155);
 	}
 
 	ofDrawCircle(pos.x, pos.y, scale * 2.0);

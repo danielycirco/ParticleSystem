@@ -4,7 +4,7 @@
 void ofApp::setup(){
 	ofSetVerticalSync(true);
 	
-	int num = 2000;
+	int num = 1500;
 	p.assign(num, demoParticle());
 	currentMode = PARTICLE_MODE_ATTRACT;
 
@@ -51,7 +51,8 @@ void ofApp::draw(){
 	//ofBackgroundGradient(ofColor(60,60,60), ofColor(10,10,10), OF_GRADIENT_LINEAR);
 
 	for(unsigned int i = 0; i < p.size(); i++){
-		p[i].draw();
+		if(p[i].visible==true)
+			p[i].draw();
 	}
 	
 	ofSetColor(190);
@@ -95,10 +96,17 @@ void ofApp::keyPressed(int key){
 	if (key == '6') {
 		currentMode = PARTICLE_MODE_GRILL;
 		currentModeStr = "6 - PARTICLE_MODE_GRILL: Grill";
+		//resetParticles();
+	}
+	if (key == '7') {
+		currentMode = PARTICLE_MODE_LIFE;
+		currentModeStr = "7 - PARTICLE_MODE_LIFE: Lifetime";
 		resetParticles();
 	}
 
-
+	if (key == 'f') {
+		ofToggleFullscreen();
+	}
 
 	
 	if( key == ' ' ){
