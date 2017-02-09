@@ -20,21 +20,25 @@ void demoParticle::reset(){
 	//the unique val allows us to set properties slightly differently for each particle
 	uniqueVal = ofRandom(-10000, 10000);
 	
-	pos.x = ofRandomWidth();
-	pos.y = ofRandomHeight();
-	
+	posInit.x = ofRandomWidth();
+	posInit.y = ofRandomHeight();
+	pos = posInit;
+
 	vel.x = ofRandom(-3.9, 3.9);
 	vel.y = ofRandom(-3.9, 3.9);
+	
+	if(mode == PARTICLE_MODE_LIFE)lifetime = 0;
+	else lifetime = 255;
 	
 	frc   = ofPoint(0,0,0);
 	
 	scale = ofRandom(0.5, 2.0);
 
 	touche = false;
-	visible = true;
-	life = 0;
+	live = true;
 	
-	if( mode == PARTICLE_MODE_NOISE ){
+	
+	if( mode == PARTICLE_MODE_SNOW ){
 		drag  = ofRandom(0.97, 0.99);
 		vel.y = fabs(vel.y) * 3.0; //make the particles all be going down
 	}else{
@@ -77,7 +81,50 @@ void demoParticle::update(){
 			vel += frc * 0.04;
 		}
 	}
-	else if( mode == PARTICLE_MODE_NOISE ){
+	else if (mode == PARTICLE_MODE_NEAREST_POINTS) {
+
+		if (attractPoints) {
+
+			//1 - find closest attractPoint 
+			ofPoint closestPt;
+			int closest = -1;
+			float closestDist = 9999999;
+
+			for (unsigned int i = 0; i < attractPoints->size(); i++) {
+				float lenSq = (attractPoints->at(i) - pos).lengthSquared();
+				if (lenSq < closestDist) {
+					closestDist = lenSq;
+					closest = i;
+				}
+			}
+
+			//2 - if we have a closest point - lets calcuate the force towards it
+			if (closest != -1) {
+				closestPt = attractPoints->at(closest);
+				float dist = sqrt(closestDist);
+
+				//in this case we don't normalize as we want to have the force proportional to distance 
+				frc = closestPt - pos;
+
+				vel *= drag;
+
+				//lets also limit our attraction to a certain distance and don't apply if 'f' key is pressed
+				if (dist < 300 && dist > 40 && !ofGetKeyPressed('f')) {
+					vel += frc * 0.003;
+				}
+				else {
+					//if the particles are not close to us, lets add a little bit of random movement using noise. this is where uniqueVal comes in handy. 			
+					frc.x = ofSignedNoise(uniqueVal, pos.y * 0.01, ofGetElapsedTimef()*0.2);
+					frc.y = ofSignedNoise(uniqueVal, pos.x * 0.01, ofGetElapsedTimef()*0.2);
+					vel += frc * 0.4;
+				}
+
+			}
+
+		}
+
+	}
+	else if( mode == PARTICLE_MODE_SNOW ){
 		//lets simulate falling snow 
 		//the fake wind is meant to add a shift to the particles based on where in x they are
 		//we add pos.y as an arg so to prevent obvious vertical banding around x values - try removing the pos.y * 0.006 to see the banding
@@ -94,49 +141,7 @@ void demoParticle::update(){
 			pos.y -= ofGetHeight();
 		}
 	}
-	else if( mode == PARTICLE_MODE_NEAREST_POINTS ){
-		
-		if( attractPoints ){
-
-			//1 - find closest attractPoint 
-			ofPoint closestPt;
-			int closest = -1; 
-			float closestDist = 9999999;
-			
-			for(unsigned int i = 0; i < attractPoints->size(); i++){
-				float lenSq = ( attractPoints->at(i)-pos ).lengthSquared();
-				if( lenSq < closestDist ){
-					closestDist = lenSq;
-					closest = i;
-				}
-			}
-			
-			//2 - if we have a closest point - lets calcuate the force towards it
-			if( closest != -1 ){
-				closestPt = attractPoints->at(closest);				
-				float dist = sqrt(closestDist);
-				
-				//in this case we don't normalize as we want to have the force proportional to distance 
-				frc = closestPt - pos;
-		
-				vel *= drag;
-				 
-				//lets also limit our attraction to a certain distance and don't apply if 'f' key is pressed
-				if( dist < 300 && dist > 40 && !ofGetKeyPressed('f') ){
-					vel += frc * 0.003;
-				}else{
-					//if the particles are not close to us, lets add a little bit of random movement using noise. this is where uniqueVal comes in handy. 			
-					frc.x = ofSignedNoise(uniqueVal, pos.y * 0.01, ofGetElapsedTimef()*0.2);
-					frc.y = ofSignedNoise(uniqueVal, pos.x * 0.01, ofGetElapsedTimef()*0.2);
-					vel += frc * 0.4;
-				}
-				
-			}
-		
-		}
-		
-	}
-	else if (mode == PARTICLE_MODE_SNOW) {
+	else if (mode == PARTICLE_MODE_DUST) {
 		float fakeWindX = ofSignedNoise(pos.x * 0.003, pos.y * 0.006, ofGetElapsedTimef() * 0.6);
 		
 		ofPoint actualPt(ofGetMouseX(), ofGetMouseY());
@@ -170,7 +175,7 @@ void demoParticle::update(){
 			}*/
 		}
 	}
-	if (mode == PARTICLE_MODE_GRILL) {
+	else if (mode == PARTICLE_MODE_GRILL) {
 		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
 		frc = attractPt - pos;
 
@@ -182,21 +187,31 @@ void demoParticle::update(){
 
 		vel.x = 0;
 
-		if ((dist < 50) || (touche == true)) {
+		// si está en el area y esta viva, si ya se ha tocado y esta viva
+		if (((dist < 50) || (touche == true)) && live == true) {
 			//vel.y *= drag; //apply drag
 			vel.y += frc.y * 2.6; //apply force
 			touche = true;
-		}
+		}// sino, no se mueve
 		else {
 			vel.y = 0;
 		}
+		// si toca fondo
 		if (pos.y + vel.y > ofGetHeight()) {
 			vel.y = 0;
+			lifetime = 0;
+			live = false;
+			touche = false;
 		}
+		// si está muerta
+		if (live == false) {
+			pos = posInit; // vuelve a pos inicial
+			lifetime++;    // fade in visual
+		}
+
+		if (lifetime == 255) live = true;
 	}
-	
-	if (mode == PARTICLE_MODE_LIFE) {
-		int lifetime = 0;
+	else if (mode == PARTICLE_MODE_LIFE) {
 		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
 		frc = attractPt - pos;
 
@@ -215,11 +230,13 @@ void demoParticle::update(){
 			vel *= 0.99;
 		}
 
-		if ((dist < 50)) life = 255;		
-		if (life > lifetime) life--;
+		if ((dist < 50)) lifetime = 255;		
+		if (lifetime > 0) lifetime--;
 			
 	}
-
+	else if (mode == PARTICLE_MODE_X) {
+		;
+	}
 
 	//2 - UPDATE OUR POSITION
 	
@@ -232,7 +249,8 @@ void demoParticle::update(){
 	if( pos.x > ofGetWidth() ){
 		pos.x = ofGetWidth();
 		vel.x *= -1.0;
-	}else if( pos.x < 0 ){
+	}
+	else if( pos.x < 0 ){
 		pos.x = 0;
 		vel.x *= -1.0;
 	}
@@ -262,20 +280,20 @@ void demoParticle::draw(){
 	else if( mode == PARTICLE_MODE_REPEL ){
 		ofSetColor(208, 255, 63);
 	}
-	else if( mode == PARTICLE_MODE_NOISE ){
+	else if( mode == PARTICLE_MODE_SNOW ){
 		ofSetColor(99, 63, 255);
 	}
 	else if( mode == PARTICLE_MODE_NEAREST_POINTS ){
 		ofSetColor(103, 160, 237);
 	}
-	else if (mode == PARTICLE_MODE_SNOW) {
+	else if (mode == PARTICLE_MODE_DUST) {
 		ofSetColor(255, 255, 255);
 	}
 	else if (mode == PARTICLE_MODE_GRILL) {
-		ofSetColor(55, 100, 255);
+		ofSetColor(lifetime, lifetime, 0);
 	}
 	else if (mode == PARTICLE_MODE_LIFE) {
-		ofSetColor(0, life, life);
+		ofSetColor(0, lifetime, lifetime);
 	}
 
 	ofDrawCircle(pos.x, pos.y, scale * 2.0);

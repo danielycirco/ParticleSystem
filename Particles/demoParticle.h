@@ -5,10 +5,11 @@ enum particleMode{
 	PARTICLE_MODE_ATTRACT = 0,
 	PARTICLE_MODE_REPEL,
 	PARTICLE_MODE_NEAREST_POINTS,
-	PARTICLE_MODE_NOISE,
 	PARTICLE_MODE_SNOW,
+	PARTICLE_MODE_DUST,
 	PARTICLE_MODE_GRILL,
-	PARTICLE_MODE_LIFE
+	PARTICLE_MODE_LIFE,
+	PARTICLE_MODE_X
 };
 
 class demoParticle{
@@ -24,11 +25,12 @@ class demoParticle{
 		void draw();		
 		
 		ofPoint pos;
+		ofPoint posInit;
 		ofPoint vel;
 		ofPoint frc;
 		bool touche;
-		bool visible;
-		int life;
+		bool live;
+		int lifetime;
 		
 		float drag; 
 		float uniqueVal;

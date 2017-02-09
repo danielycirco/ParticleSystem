@@ -2,9 +2,9 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	ofSetVerticalSync(true);
+	ofSetVerticalSync(false);
 	
-	int num = 1000;
+	int num = 1500;
 	p.assign(num, demoParticle());
 	currentMode = PARTICLE_MODE_ATTRACT;
 
@@ -49,12 +49,20 @@ void ofApp::update(){
 void ofApp::draw(){
 	ofBackground(0,0,0);
 	//ofBackgroundGradient(ofColor(60,60,60), ofColor(10,10,10), OF_GRADIENT_LINEAR);
-
-	for(unsigned int i = 0; i < p.size(); i++){
-		if(p[i].visible==true)
-			p[i].draw();
-	}
+	/*
+	if (currentMode == PARTICLE_MODE_GRILL) {
+		ofPoint origin = { 20,20,0 };
+		for (unsigned int i = 0; i < 768/20; i++) {
+			for (unsigned int j = 0; j < 1024/20; j++) {
+				p[i].pos = { origin.x + j * 20, origin.y + i * 20 , 0 };
+			}
+		}
+	}*/
 	
+	for (unsigned int i = 0; i < p.size(); i++) {
+		p[i].draw();
+	}
+		
 	ofSetColor(190);
 	if( currentMode == PARTICLE_MODE_NEAREST_POINTS ){
 		for(unsigned int i = 0; i < attractPoints.size(); i++){
@@ -66,7 +74,7 @@ void ofApp::draw(){
 	}
 
 	ofSetColor(230);	
-	ofDrawBitmapString(currentModeStr + "\n\nSpacebar to reset. \nKeys 1-4 to change mode. \nFramerate: " + ofToString(ofGetFrameRate(),0) , 10, 20);
+	ofDrawBitmapString(currentModeStr + "\n\nSpacebar to reset. \nKeys 1-4 to change mode. \nFramerate: " + ofToString(ofGetFrameRate(),0), 10, 20);
 }
 
 //--------------------------------------------------------------
@@ -84,19 +92,19 @@ void ofApp::keyPressed(int key){
 		currentModeStr = "3 - PARTICLE_MODE_NEAREST_POINTS: hold 'f' to disable force"; 						
 	}
 	if( key == '4'){
-		currentMode = PARTICLE_MODE_NOISE;
-		currentModeStr = "4 - PARTICLE_MODE_NOISE: snow particle simulation"; 						
+		currentMode = PARTICLE_MODE_SNOW;
+		currentModeStr = "4 - PARTICLE_MODE_SNOW: snow particle simulation"; 						
 		resetParticles();
 	}	
 	if (key == '5') {
-		currentMode = PARTICLE_MODE_SNOW;
-		currentModeStr = "5 - PARTICLE_MODE_SNOW: Waves";
+		currentMode = PARTICLE_MODE_DUST;
+		currentModeStr = "5 - PARTICLE_MODE_DUST: Waves";
 		resetParticles();
 	}
 	if (key == '6') {
 		currentMode = PARTICLE_MODE_GRILL;
 		currentModeStr = "6 - PARTICLE_MODE_GRILL: Grill";
-		//resetParticles();
+		resetParticles();
 	}
 	if (key == '7') {
 		currentMode = PARTICLE_MODE_LIFE;
