@@ -23,6 +23,7 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+		int textCounter;
 		//Cam
 		
 		particleMode currentMode;
@@ -30,7 +31,8 @@ class ofApp : public ofBaseApp{
 		objectCam camera;
 
 		vector <demoParticle> p;
+		vector <demoParticle> pLine;
 		vector <ofPoint> attractPoints;
 		vector <ofPoint> attractPointsWithMovement;
-		
+		vector <string> text;
 };

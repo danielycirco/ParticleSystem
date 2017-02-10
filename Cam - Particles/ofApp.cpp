@@ -10,6 +10,7 @@ void ofApp::setup(){
 
 	currentModeStr = "1 - PARTICLE_MODE_ATTRACT: attracts to mouse"; 
 
+
 	resetParticles();
 
 	camera.setup();
@@ -76,7 +77,7 @@ void ofApp::draw(){
 	}
 
 	ofSetColor(230);	
-	ofDrawBitmapString(currentModeStr + "\n\nSpacebar to reset. \nKeys 1-4 to change mode.", 10, 20);
+	ofDrawBitmapString(currentModeStr + "\n\nSpacebar to reset. \nKeys 1-4 to change mode. \nFramerate: " + ofToString(ofGetFrameRate(), 0), 10, 20);
 	
 	// Object identificator
 	ofNoFill();
