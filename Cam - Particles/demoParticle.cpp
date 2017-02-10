@@ -64,7 +64,7 @@ void demoParticle::update(){
 		}
 	}
 	else if( mode == PARTICLE_MODE_REPEL ){
-		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
+		ofPoint attractPt(ballX, ballY);
 		frc = attractPt-pos; 
 		
 		//let get the distance and only repel points close to the mouse
@@ -178,7 +178,7 @@ void demoParticle::update(){
 		}
 	}
 	else if (mode == PARTICLE_MODE_GRILL) {
-		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
+		ofPoint attractPt(ballX, ballY);
 		frc = attractPt - pos;
 
 		//let get the distance and only repel points close to the mouse
@@ -214,7 +214,7 @@ void demoParticle::update(){
 		if (lifetime == 255) live = true;
 	}
 	else if (mode == PARTICLE_MODE_LIFE) {
-		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
+		ofPoint attractPt(ballX, ballY);
 		frc = attractPt - pos;
 
 		//let get the distance and only repel points close to the mouse
@@ -236,8 +236,23 @@ void demoParticle::update(){
 		if (lifetime > 0) lifetime--;
 			
 	}
-	else if (mode == PARTICLE_MODE_X) {
-		;
+	else if (mode == PARTICLE_MODE_WORD) {
+
+		ofPoint attractPt(ofGetMouseX(), ofGetMouseY());
+		ofPoint pos2 = pos;
+
+		if (ofGetMousePressed()) {
+			pos.y = ofGetMouseY();
+			vel *= 0;
+		}
+		ofPoint attractPt2(ofGetMouseX(), ofGetMouseY());
+		frc = attractPt2 - pos2;
+		//let get the distance and only repel points close to the mouse
+		float dist = frc.length();
+		frc.normalize();
+		if (dist < 10) {
+			vel += -frc * 3; //notice the frc is negative 
+		}
 	}
 
 	//2 - UPDATE OUR POSITION
@@ -296,8 +311,14 @@ void demoParticle::draw(){
 	else if (mode == PARTICLE_MODE_LIFE) {
 		ofSetColor(0, lifetime, lifetime);
 	}
-
-	ofDrawCircle(pos.x, pos.y, scale * 2.0);
+	
+	if (mode == PARTICLE_MODE_WORD) {
+		//char letters[] = "abcdefghijklmnopqrstuvwxyz";
+		//char letter = letters[rand() % 26];
+		//ofDrawBitmapString(letter, pos.x, pos.y);
+		;
+	}
+	else ofDrawCircle(pos.x, pos.y, scale * 2.0);
 
 	//ofDrawTriangle(pos.x, pos.y, pos.x+10, pos.y+10, pos.x-10, pos.y+10);
 		

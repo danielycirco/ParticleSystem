@@ -10,7 +10,7 @@ void ofApp::setup(){
 	currentMode = PARTICLE_MODE_ATTRACT;
 
 	currentModeStr = "1 - PARTICLE_MODE_ATTRACT: attracts to mouse"; 
-	text = {"Liberté","egalité","fraternité"};
+	text = {"Liberte","egalite","fraternite"};
 	textCounter = 0;
 
 	resetParticles();
@@ -119,12 +119,12 @@ void ofApp::draw(){
 		
 	}
 
-	/*if (currentMode == PARTICLE_MODE_WORD && ofGetMousePressed()) {
+	if (currentMode == PARTICLE_MODE_WORD && ofGetMousePressed()) {
 		p[textCounter].pos.x = ofGetMouseX();
 		p[textCounter].pos.y = ofGetMouseY();
-		ofDrawBitmapString(text[textCounter], p[textCounter].pos);
+		ofDrawBitmapString(text[textCounter % 3], p[textCounter].pos);
 		textCounter++;
-	}*/
+	}
 
 	// Object identificator
 	ofNoFill();
@@ -171,6 +171,11 @@ void ofApp::keyPressed(int key){
 	if (key == '7') {
 		currentMode = PARTICLE_MODE_LIFE;
 		currentModeStr = "7 - PARTICLE_MODE_LIFE: Lifetime";
+		resetParticles();
+	}
+	if (key == '8') {
+		currentMode = PARTICLE_MODE_WORD;
+		currentModeStr = "8 - PARTICLE_MODE_WORD: Words";
 		resetParticles();
 	}
 
