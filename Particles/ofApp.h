@@ -22,12 +22,14 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+		int textCounter;
 		
 		particleMode currentMode;
 		string currentModeStr; 
 
 		vector <demoParticle> p;
+		vector <demoParticle> pLine;
 		vector <ofPoint> attractPoints;
 		vector <ofPoint> attractPointsWithMovement;
-		
+		vector <string> text;
 };

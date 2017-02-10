@@ -106,11 +106,13 @@ void demoParticle::update(){
 				//in this case we don't normalize as we want to have the force proportional to distance 
 				frc = closestPt - pos;
 
+				//Para que las particulas se desplacen muy lento se usa un drag de valor pequeño ~0.1
+				//drag = 0.11; 
 				vel *= drag;
 
-				//lets also limit our attraction to a certain distance and don't apply if 'f' key is pressed
-				if (dist < 300 && dist > 40 && !ofGetKeyPressed('f')) {
-					vel += frc * 0.003;
+				//lets also limit our attraction to a certain distance and don't apply if 'p' key is pressed
+				if (dist < 300 && dist > 40 && !ofGetKeyPressed('p')) {
+					vel += frc * 0.005;
 				}
 				else {
 					//if the particles are not close to us, lets add a little bit of random movement using noise. this is where uniqueVal comes in handy. 			
@@ -268,7 +270,6 @@ void demoParticle::update(){
 		pos.y = 0;
 		vel.y *= -1.0;
 	}	
-	
 }
 
 //------------------------------------------------------------------
