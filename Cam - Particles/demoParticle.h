@@ -1,4 +1,5 @@
 #pragma once
+
 #include "ofMain.h"
 
 enum particleMode{
@@ -23,7 +24,7 @@ class demoParticle{
 
 		void reset();
 		void update();
-		void draw();		
+		void draw();
 
 		void newPosition(int, int);
 		

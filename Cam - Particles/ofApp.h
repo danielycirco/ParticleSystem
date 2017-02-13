@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include "demoParticle.h"
-#include "oCam.h"
+#include "objectCam.h"
 
 class ofApp : public ofBaseApp{
 
@@ -24,10 +24,11 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		int textCounter;
+		//Cam
 		
 		particleMode currentMode;
 		string currentModeStr; 
-		oCam camera;
+		objectCam camera;
 
 		vector <demoParticle> p;
 		vector <demoParticle> pLine;
