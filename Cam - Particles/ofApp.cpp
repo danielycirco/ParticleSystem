@@ -1,16 +1,16 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup(){
+void ofApp::setup() {
 	ofSetVerticalSync(false);
-	
+
 	int num = 1000;
 	p.assign(num, demoParticle());
 	pLine.assign(60, demoParticle());
 	currentMode = PARTICLE_MODE_ATTRACT;
 
-	currentModeStr = "1 - PARTICLE_MODE_ATTRACT: attracts to mouse"; 
-	text = {"Liberte","egalite","fraternite"};
+	currentModeStr = "1 - PARTICLE_MODE_ATTRACT: attracts to mouse";
+	text = { "Liberte","egalite","fraternite" };
 	textCounter = 0;
 
 	resetParticles();
@@ -18,18 +18,18 @@ void ofApp::setup(){
 }
 
 //--------------------------------------------------------------
-void ofApp::resetParticles(){
+void ofApp::resetParticles() {
 	//Words
 	textCounter = 0;
 
 	//Sistema 3
 	if (currentMode == PARTICLE_MODE_NEAREST_POINTS) {
 		attractPoints.clear();
-		
+
 		for (int i = 0; i < 3; i++) {
 			attractPoints.push_back(ofPoint(ofMap(i, 0, 3, 100, ofGetWidth() - 100), ofRandom(100, ofGetHeight() - 100)));
 		}
-		  ///////// Atracción a lineas del triangulo
+		///////// Atracción a lineas del triangulo
 		for (int i = 0; i < 3; i++) {
 			ofPoint dx;
 			if (i == 2) dx = (attractPoints[0] - attractPoints[i]) / 20;
@@ -37,72 +37,71 @@ void ofApp::resetParticles(){
 			for (int j = 0; j < 20; j++) pLine[j + i * 20].pos = attractPoints[i] + dx*j;
 		}
 		for (int i = 0; i < 60; i++) attractPoints.push_back(pLine[i].pos);
-		
-	}	
-	
-	
-	
-	for(unsigned int i = 0; i < p.size(); i++){
-		p[i].setMode(currentMode);		
+
+	}
+
+
+
+	for (unsigned int i = 0; i < p.size(); i++) {
+		p[i].setMode(currentMode);
 		p[i].setAttractPoints(&attractPoints);
 		p[i].reset();
-	}	
+	}
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
-	
-	int posBallX = camera.getPosBallX();
-	int posBallY = camera.getPosBallY();
+void ofApp::update() {
+
+	//Camera
 	camera.update();
+	camera.posBall();
 
-
-
+	
 	//Sistema 3
 	if (currentMode == PARTICLE_MODE_NEAREST_POINTS) {
 		for (unsigned int i = 0; i < attractPoints.size(); i++) {
 			attractPoints[i].x = attractPoints[i].x + ofSignedNoise(i * 10, ofGetElapsedTimef() * 1.7) * 1.0;
 			attractPoints[i].y = attractPoints[i].y + ofSignedNoise(i * -10, ofGetElapsedTimef() * 0.7) * 1.0;
 		}
-		 ///////// Atracción a lineas del triangulo
+		///////// Atracción a lineas del triangulo
 		for (int i = 0; i < 3; i++) {
 			ofPoint dx;
 			if (i == 2) dx = (attractPoints[0] - attractPoints[i]) / 20;
 			else dx = (attractPoints[i + 1] - attractPoints[i]) / 20;
 			for (int j = 0; j < 20; j++) pLine[j + i * 20].pos = attractPoints[i] + dx*j;
 		}
-		for (int i = 3; i < 60; i++) attractPoints[i]=pLine[i].pos;
+		for (int i = 3; i < 60; i++) attractPoints[i] = pLine[i].pos;
 	}
 
 	for (unsigned int i = 0; i < p.size(); i++) {
 		p[i].setMode(currentMode);
 		p[i].setAttractPoints(&attractPoints);
-		p[i].newPosition(posBallX, posBallY);
+		p[i].newPosition(camera.pos[0].x / 320 * ofGetWidth()*2, camera.pos[0].y / 240 * ofGetHeight()*2);
 		p[i].update();
 	}
 }
 
 //--------------------------------------------------------------
-void ofApp::draw(){
-	ofBackground(0,0,0);
+void ofApp::draw() {
+	ofBackground(0, 0, 0);
 	//ofBackgroundGradient(ofColor(60,60,60), ofColor(10,10,10), OF_GRADIENT_LINEAR);
 	/*
 	if (currentMode == PARTICLE_MODE_GRILL) {
-		ofPoint origin = { 20,20,0 };
-		for (unsigned int i = 0; i < 768/20; i++) {
-			for (unsigned int j = 0; j < 1024/20; j++) {
-				p[i].pos = { origin.x + j * 20, origin.y + i * 20 , 0 };
-			}
-		}
+	ofPoint origin = { 20,20,0 };
+	for (unsigned int i = 0; i < 768/20; i++) {
+	for (unsigned int j = 0; j < 1024/20; j++) {
+	p[i].pos = { origin.x + j * 20, origin.y + i * 20 , 0 };
+	}
+	}
 	}*/
-	
+
 	for (unsigned int i = 0; i < p.size(); i++) {
 		p[i].draw();
 	}
 
 	//Sistema 3
 	ofSetColor(190);
-	if( currentMode == PARTICLE_MODE_NEAREST_POINTS ){
+	if (currentMode == PARTICLE_MODE_NEAREST_POINTS) {
 		ofNoFill();
 		ofDrawTriangle(attractPoints[0].x, attractPoints[0].y, attractPoints[1].x, attractPoints[1].y, attractPoints[2].x, attractPoints[2].y);
 		ofFill();
@@ -116,7 +115,7 @@ void ofApp::draw(){
 		for (unsigned int i = 0; i < pLine.size(); i++) {
 			ofDrawCircle(pLine[i].pos, 4);
 		}
-		
+
 	}
 
 	if (currentMode == PARTICLE_MODE_WORD && ofGetMousePressed()) {
@@ -128,36 +127,36 @@ void ofApp::draw(){
 
 	// Object identificator
 	ofNoFill();
-	ofDrawCircle(camera.getPosBallX(), camera.getPosBallY(), 10);
+	ofDrawCircle(camera.pos[0].x / 320 * ofGetWidth()*2, camera.pos[0].y / 240 * ofGetHeight()*2, 10);
 	ofFill();
 
 	// Information printing
-	ofSetColor(230);	
-	ofDrawBitmapString(currentModeStr + "\n\nSpacebar to reset. \nKeys 1-4 to change mode. \nFramerate: " + ofToString(ofGetFrameRate(),0), 10, 20);
+	ofSetColor(230);
+	ofDrawBitmapString(currentModeStr + "\n\nSpacebar to reset. \nKeys 1-4 to change mode. \nFramerate: " + ofToString(ofGetFrameRate(), 0), 10, 20);
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
-	if( key == '1'){
+void ofApp::keyPressed(int key) {
+	if (key == '1') {
 		currentMode = PARTICLE_MODE_ATTRACT;
-		currentModeStr = "1 - PARTICLE_MODE_ATTRACT: attracts to mouse"; 		
+		currentModeStr = "1 - PARTICLE_MODE_ATTRACT: attracts to mouse";
 		resetParticles();
 	}
-	if( key == '2'){
+	if (key == '2') {
 		currentMode = PARTICLE_MODE_REPEL;
-		currentModeStr = "2 - PARTICLE_MODE_REPEL: repels from mouse"; 				
+		currentModeStr = "2 - PARTICLE_MODE_REPEL: repels from mouse";
 		resetParticles();
 	}
-	if( key == '3'){
+	if (key == '3') {
 		currentMode = PARTICLE_MODE_NEAREST_POINTS;
-		currentModeStr = "3 - PARTICLE_MODE_NEAREST_POINTS: hold 'f' to disable force"; 						
+		currentModeStr = "3 - PARTICLE_MODE_NEAREST_POINTS: hold 'f' to disable force";
 		resetParticles();
 	}
-	if( key == '4'){
+	if (key == '4') {
 		currentMode = PARTICLE_MODE_SNOW;
-		currentModeStr = "4 - PARTICLE_MODE_SNOW: snow particle simulation"; 						
+		currentModeStr = "4 - PARTICLE_MODE_SNOW: snow particle simulation";
 		resetParticles();
-	}	
+	}
 	if (key == '5') {
 		currentMode = PARTICLE_MODE_DUST;
 		currentModeStr = "5 - PARTICLE_MODE_DUST: Waves";
@@ -185,51 +184,51 @@ void ofApp::keyPressed(int key){
 }
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key){
+void ofApp::keyReleased(int key) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
+void ofApp::mouseMoved(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
+void ofApp::mouseDragged(int x, int y, int button) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
+void ofApp::mousePressed(int x, int y, int button) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
+void ofApp::mouseReleased(int x, int y, int button) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
+void ofApp::mouseEntered(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
+void ofApp::mouseExited(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
+void ofApp::windowResized(int w, int h) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
+void ofApp::gotMessage(ofMessage msg) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::dragEvent(ofDragInfo dragInfo) {
 
 }

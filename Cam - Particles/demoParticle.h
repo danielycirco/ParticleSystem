@@ -1,7 +1,7 @@
 #pragma once
 #include "ofMain.h"
 
-enum particleMode{
+enum particleMode {
 	PARTICLE_MODE_ATTRACT = 0,
 	PARTICLE_MODE_REPEL,
 	PARTICLE_MODE_NEAREST_POINTS,
@@ -13,36 +13,36 @@ enum particleMode{
 	PARTICLE_MODE_WORD
 };
 
-class demoParticle{
+class demoParticle {
 
-	public:
-		demoParticle();
-		
-		void setMode(particleMode newMode);	
-		void setAttractPoints( vector <ofPoint> * attract );
+public:
+	demoParticle();
 
-		void reset();
-		void update();
-		void draw();		
+	void setMode(particleMode newMode);
+	void setAttractPoints(vector <ofPoint> * attract);
 
-		void newPosition(int, int);
-		
-		ofPoint pos;
-		ofPoint posInit;
-		ofPoint vel;
-		ofPoint frc;
-		bool touche;
-		bool live;
-		int lifetime;
-		
-		float drag; 
-		float uniqueVal;
-		float scale;
-		
-		particleMode mode;
-		
-		vector <ofPoint> * attractPoints; 
+	void reset();
+	void update();
+	void draw();
 
-		int ballX;
-		int ballY;
+	void newPosition(int, int);
+
+	ofPoint pos;
+	ofPoint posInit;
+	ofPoint vel;
+	ofPoint frc;
+	bool touche;
+	bool live;
+	int lifetime;
+
+	float drag;
+	float uniqueVal;
+	float scale;
+
+	particleMode mode;
+
+	vector <ofPoint> * attractPoints;
+
+	int ballX;
+	int ballY;
 };
